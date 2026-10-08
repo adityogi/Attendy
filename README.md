@@ -1,144 +1,123 @@
-# Attendy — RVCE Attendance & CIE Eligibility Manager
+# Attendly
 
-A high-performance, offline-capable Progressive Web App (PWA) tailored for college students (pre-configured for RVCE CSE-AIML Section CI-A). Tracks class-by-class attendance, provides instant one-tap logging, and computes precise CIE (85%) exam eligibility and safe bunk counts.
+A React + TypeScript attendance website and Capacitor Android app, with a shared account backend. Built for separate, per-subject attendance tracking and leave forecasting. Kept local at your request; no public deployment or external account was created.
 
----
+## Start here
 
-## ⚡ Motorola Edge 60 Fusion Optimizations
+Use Node.js 22 or newer and pnpm. From this folder:
 
-Attendy is specifically fine-tuned for the **Moto Edge 60 Fusion** display and hardware specs:
-
-| Feature | Moto Edge 60 Fusion Spec | Attendy Implementation |
-|---|---|---|
-| **P-OLED Display** | 6.67" Super HD+ (1220 × 2712 px) | Pure black theme (`#000000`) in dark mode turns off OLED pixels to maximize battery life. |
-| **Refresh Rate** | 120Hz fluid panel | GPU-accelerated transitions via `will-change: transform` and tuned easing curves for zero-jank 120fps interactions. |
-| **Pixel Density** | ~446 ppi | Sharp typography, crisp SVG vector icons, and scaled borders adapted for high-DPI viewports. |
-| **Curved 3D Glass** | Quad-Curved edge-to-edge | Dynamic `env(safe-area-inset-*)` padding ensures buttons and headers never clip on curved edges. |
-| **Gesture Navigation** | Android bottom bar | Extended bottom navigation padding (`safe-bottom`) prevents conflict with Android swipe navigation gestures. |
-| **Haptic Feedback** | Linear vibration motor | Sub-audible 15ms haptic feedback pulses on tapping Present / Absent buttons (`navigator.vibrate(15)`). |
-| **Touch Targets** | Ergonomic single-hand reach | 48dp minimum touch target sizes following Android Material Design standards. |
-
----
-
-## 🚀 How to Host on Vercel
-
-Attendy is 100% static and zero-dependency, making Vercel deployment instant and free.
-
-### Option A: Using the Vercel CLI (Recommended)
-
-1. Open your terminal and install Vercel CLI if you haven't already:
-   ```bash
-   npm i -g vercel
-   ```
-2. Navigate to this directory and deploy:
-   ```bash
-   cd /Users/roost/Downloads/Attendy
-   vercel
-   ```
-3. Follow the quick prompts:
-   - *Set up and deploy?* **Y**
-   - *Which scope?* Select your personal account
-   - *Link to existing project?* **N**
-   - *Project name?* `attendy` (or your choice)
-   - *Directory?* `./`
-4. For production deployment:
-   ```bash
-   vercel --prod
-   ```
-
-### Option B: Deploying via GitHub & Vercel Dashboard
-
-1. Push this directory to a GitHub repository:
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit for Attendy"
-   git remote add origin https://github.com/<your-username>/attendy.git
-   git push -u origin main
-   ```
-2. Go to [vercel.com](https://vercel.com) and log in.
-3. Click **Add New** $\to$ **Project**.
-4. Import your `attendy` repository.
-5. Leave Framework Preset as **Other** (Root directory `./`).
-6. Click **Deploy**. Vercel will immediately deploy and assign an SSL `https://attendy-*.vercel.app` URL.
-
----
-
-## 📱 How to Install & Run on Android (Moto Edge 60 Fusion)
-
-Once hosted on Vercel (or any HTTPS domain):
-
-1. **Open Google Chrome** (or Edge / Brave) on your Moto Edge 60 Fusion.
-2. Navigate to your deployed Vercel URL (e.g. `https://attendy.vercel.app`).
-3. You will see an **"Install app"** banner, or tap the **three dots menu (⋮)** in the top right.
-4. Tap **"Install app"** or **"Add to Home Screen"**.
-5. Tap **Add**.
-6. The app will install directly onto your home screen and app drawer as an independent, full-screen application without URL bars.
-
-### PWA & Offline Capabilities:
-- **100% Offline Support**: Works even with Airplane mode enabled using the Service Worker cache (`attendy-cache-v4`).
-- **App Shortcuts**: Long-press the home screen icon on your Moto Edge 60 Fusion to quickly open:
-  - 📅 *Mark Today's Attendance*
-  - 🛡️ *CIE Eligibility Check*
-  - 🔮 *Future Predictor*
-- **Local Storage Isolation**: Your data remains private on your device; no database or external tracking required.
-
----
-
-## 🌟 Key Features
-
-### 1. 🏛️ Pre-Loaded Timetable: RVCE CSE (AIML) Section CI-A
-- **Classroom**: `AIML CR-001`
-- **Courses**:
-  - `MA211TC`: Fundamentals of Linear Algebra & Calculus *(Dr. Satish V.M.)* — *pre-configured baseline 15/18*
-  - `CM211IA`: Chemistry of Smart Materials *(Dr. Girisha kumar)*
-  - `ME112GL`: Computer Aided Engineering Graphics Theory & Lab *(Dr. Ramakrishna Hegde)*
-  - `XX113XTX`: Engineering Science Course-1
-  - `XX115XIX`: Programming Language Courses (Theory & Lab)
-  - `HS111EL`: Communicative English-1 *(Prof. Ramthilak)*
-  - `HS112TC`: Indian Constitution *(Vageesh Hp)*
-  - `HS115YL`: Health & Yoga Practice *(Rajesh / Manasa)*
-  - `Experiential Learning` & `Counselling`
-- **AI / Text Timetable Importer**: Paste any schedule or upload a photo to extract your slots via on-demand OCR (Tesseract.js).
-
-### 2. 📅 Today's Classes & Daily Tracking
-- One-tap marking:
-  - **Present**: Increases attended and total counts.
-  - **Absent**: Marks miss and alerts you immediately of your bunk buffer.
-  - **Free / Cancelled**: Class called off; does not penalize percentage.
-- **Catch-Up Banner**: Notifies you of any past unmarked sessions.
-- **Mark All Present / All Absent**: Rapid bulk marking.
-- **Add Extra Class**: Record substitute or compensation lectures.
-
-### 3. 🎯 85% Target & Smart Bunk Calculator
-- **Safe Zone ($\ge 85\%$)**:
-  $$\text{Safe Bunks} = \left\lfloor \frac{\text{Attended} - 0.85 \times \text{Total}}{0.85} \right\rfloor$$
-- **Shortage Zone ($< 85\%$)**:
-  $$\text{Classes Needed} = \left\lceil \frac{0.85 \times \text{Total} - \text{Attended}}{1 - 0.85} \right\rceil$$
-- **Custom Threshold**: Adjust per-course targets from 50% to 100% with the slider.
-
-### 4. 🔮 Future Attendance Predictor
-- Pick upcoming dates you plan to take off.
-- Automatically takes 2026 RVCE college holidays into account.
-- Simulates your projected semester percentage before you skip!
-
-### 5. 📜 History, Audit Logs & Backup
-- Complete record of dates, times, and reason chips (Medical, OD, Fest, etc.).
-- Export / Import full JSON or CSV backups.
-
----
-
-## 📁 File Structure
-
+```sh
+pnpm install
+pnpm build
+pnpm db:local
+pnpm preview
 ```
-Attendy/
-├── index.html       # Single-page application entry point (Vercel default)
-├── styles.css       # Tailwind utility styles + Moto Edge 60 Fusion OLED & 120Hz rules
-├── app.js           # Application engine, bunk calculator math, PWA shortcuts, haptics
-├── sw.js            # Offline service worker (stale-while-revalidate)
-├── manifest.json    # Android PWA manifest (shortcuts, standalone display, maskable icons)
-├── vercel.json      # Vercel deployment configuration, security & caching headers
-├── icon.svg         # High-resolution vector icon
-├── rvce_holidays_2026.json # Pre-loaded RVCE academic holidays
-└── README.md        # Documentation and deployment guide
+
+Open **http://localhost:8787**. This serves the production website and its local account backend together. Create an account in the app and save its recovery code. Real accounts start empty; the initial sample workspace is clearly labelled and does not become your actual history.
+
+For development, keep two terminals running:
+
+```sh
+pnpm dev:api
 ```
+
+```sh
+pnpm dev
+```
+
+The development website is **http://127.0.0.1:5173** and forwards account requests to port 8787. Use a consistent URL; different browser origins have separate session caches. Local account data is stored in `.wrangler/state/`; keep that directory to preserve local accounts. It is deliberately excluded from the downloadable source archive.
+
+## What is included
+
+- **Actual attendance:** present, absent, cancelled, or unmarked for each scheduled class. Ordinary marking is restricted to today, enforced in both the UI and the account API. Past history is read-only except through the explicit import workflow. Future records are rejected even during import.
+- **Separate leave planner:** choose a forecast start/end date, whole days or date ranges off, or individual classes. It assumes attendance at all other future classes. Planning never writes actual attendance.
+- **Per-subject percentages:** no overall aggregate substitutes for a subject's requirement. Separate 1–100% sliders default to 85% for the tracker and planner.
+- **Calendar:** day, month, and year views, touch-friendly attendance controls and mobile navigation.
+- **Timetables:** image recognition, PDF/text extraction, CSV and JSON imports, editable review, manual entry, JSON export, and dated schedule versions. An initial timetable can start on 29 September 2026; subsequent updates preserve earlier schedules.
+- **Holidays:** image/PDF, CSV, JSON, text and ICS calendar imports with review, plus manual date ranges. Holiday classes are excluded from both calculations.
+- **History:** CSV column mapping, quoted-field handling, duplicate checks, CSV export and full JSON backup/restore. Repeated classes of one subject on a day are distinguished by slot ID or start time.
+- **Accounts:** username/password sign-in, recovery codes, separate user data, hashed passwords and session tokens, expiring sessions, and basic login throttling.
+- **Sync:** saves through a shared server, refreshes every 30 seconds and on focus, caches data locally, and detects conflicting edits. Pending changes remain on the device for retry or export.
+- **Android:** generated Android Studio project; built-in file selection and native export sharing.
+- **Installable web app:** manifest, icons, and production service worker. Once its assets are cached over HTTPS, the app can reopen offline. Image recognition files are bundled locally.
+
+## Attendance rules
+
+Tracking begins **2026-09-29** and dates use **Asia/Kolkata**. “Today” follows the real clock rather than being frozen at the start date. Keep your device clock correct; the server also checks its own date when accepting attendance changes.
+
+For a subject, attendance is `present / (present + absent) × 100`. Cancelled classes and holidays are excluded. Unmarked past/current classes are **not** assumed present or absent; the app shows a warning and treats percentages as provisional.
+
+Each timetable row is one class. A two-period lab can be entered as two rows if your college counts those periods separately. Use distinct subject names or codes for separate courses/labs, and reuse a name when its count should continue through a timetable update.
+
+Forecast percentages cover the selected window. To include all attendance since tracking began, leave **From** at 29 September 2026. For an October-only prediction, set it to 1 October. Future classes use whichever timetable version applies on that date. Holiday overrides apply to all versions.
+
+The tracker’s “can miss” number means additional future classes can be missed while keeping the target. The planner’s allowance means how many currently assumed-present classes **inside its fixed forecast window** can be changed to absences. Recovery counts assume consecutive attended classes after the measured period. A 100% target is unreachable once the period includes an absence.
+
+## Uploads and examples
+
+Try `examples/sample-timetable.png` to see image recognition. The complete 5-day / 15-class example was checked in the browser. Photo recognition uses Tesseract locally; no image is sent to an OCR API. English printed tables with weekday rows or columns and explicit time ranges work best. Merged cells, rotated/blurred photos, abbreviations, and unusual table layouts need manual review. Do not accept guessed rows without checking the reference image.
+
+PDF uploads extract text, or OCR scanned pages. Image-grid recognition is strongest for image uploads; complex PDF grids may require corrected text or manual rows. Files are limited to 20 MB; PDFs to 12 pages. Photos and source PDFs are not stored in your account—only the reviewed structured data is synced.
+
+Holiday dates accept ISO `YYYY-MM-DD`, `DD/MM/YYYY`, and dates such as `2 October 2026`. Include a year. ICS events with multi-day, all-day ranges use an exclusive end date. Review extracted holidays; the app is not a complete recurring-event ICS engine.
+
+`examples/timetable.csv`, `examples/holidays.csv`, and `examples/history.csv` illustrate the import formats. These are examples, not your actual college calendar. The CSV mapper supports alternate column names; exact compatibility with the unspecified “RVC utility” format has not been verified against an original RVC export.
+
+## Offline work and conflicts
+
+A signed-in device keeps a local cache, while the server remains authoritative. Edits are queued if it is unavailable. A competing save causes a visible conflict rather than silently overwriting data: export the local copy, load the cloud copy, then selectively reapply or import the intended changes.
+
+If a session expires, use **Sign in again**. Pending work for that username is preserved and retried against its original revision, so an intervening change on another device still produces a conflict.
+
+An attendance mark queued offline on one date and uploaded after midnight can be rejected by the strict today-only server rule. Export it and use the explicit history import to restore that date. This preserves the separation between ordinary marking and historical corrections.
+
+Local caches and backups contain attendance information. Sign out on a shared device once all work is synced. Full backups do not include passwords, authentication tokens, or recovery codes.
+
+## Android
+
+The `android/` folder is a real Capacitor Android Studio project sharing the React UI and calculation logic. It targets SDK 35, requires Android 8+ (API 26), and checks for Android System WebView 124+. An older WebView gets an update screen.
+
+The Android app needs a reachable **HTTPS account backend** for cross-device sync. `localhost` in an installed app is its local asset host, not this computer. Follow `DEPLOYMENT.md`, then set the backend origin in a local `.env` file:
+
+```dotenv
+VITE_API_URL=https://YOUR-BACKEND-ORIGIN
+```
+
+Then:
+
+```sh
+pnpm android:sync
+pnpm android:open
+```
+
+In Android Studio, install the requested SDK/build tools, select JDK 21 for Gradle, sync the project, then run on an emulator/device. Build an APK using the Build menu; use a signed release build for distribution. No release signing key is bundled. Native exports use Android’s share sheet; you can choose a file manager or other destination.
+
+After any web source change, run `pnpm android:sync` again. For a website and backend deployed together, build the web version with `VITE_API_URL` empty; for Android or a separately hosted frontend, set it to the backend origin before building.
+
+**Validation limit:** Android sources were generated and synchronized successfully. No APK was compiled and no Android emulator/device test was run because Java, Android Studio and the Android SDK were unavailable on this computer.
+
+## Checks
+
+```sh
+pnpm test
+pnpm build
+# With the local backend running:
+pnpm test:api
+```
+
+Tests cover subject isolation, date locks, forecast assumptions, holidays, cancelled/unmarked classes, timetable versions, rounding, 100% targets, CSV mapping/round trips, duplicates, ICS dates, and grid parsing. API integration checks create temporary local test accounts and verify authentication, sync, conflicts, user isolation, future-record rejection, recovery, logout, and CORS. Use a local test database for these tests.
+
+Browser checks exercised marking today, future locking, independent planning, the image review workflow, and a 390-pixel mobile layout without horizontal overflow. The optional read-only WebMCP summary tool was checked with valid and invalid inputs.
+
+## Project map
+
+- `src/domain.ts`: dates, validation, class occurrences, recorded and forecast calculations.
+- `src/App.tsx`, `Calendar.tsx`, `Editors.tsx`: product UI.
+- `src/io.ts`, `grid.ts`: imports, exports, local OCR and table mapping.
+- `src/useStore.ts`, `api.ts`: account sessions, synchronization and offline cache.
+- `server/worker.ts`: account API and storage access.
+- `db/schema.ts`, `drizzle/`: database schema and generated migration.
+- `scripts/`: build, local OCR assets and service worker generation.
+- `android/`: Android project.
+
+Deployment options and configuration are in `DEPLOYMENT.md`.

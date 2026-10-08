@@ -1,0 +1,226 @@
+import { useCallback, useEffect, useRef, useState } from "react";
+import { State, today } from "./domain";
+import { cached, readSession, request, Session } from "./api";
+export function useStore(initial: () => State) {
+  const [session, setSession] = useState<Session | null>(readSession);
+  const [state, setState] = useState<State>(() => {
+    const u = readSession();
+    return u ? (cached(u)?.state ?? initial()) : initial();
+  });
+  const [status, setStatus] = useState("Sample workspace");
+  const [error, setError] = useState("");
+  const [ready, setReady] = useState(!session);
+  const [clock, setClock] = useState(today());
+  const [tick, setTick] = useState(0);
+  const current = useRef(state),
+    revision = useRef(0),
+    pending = useRef(false),
+    intent = useRef("edit"),
+    busy = useRef(false),
+    identity = useRef(session?.token);
+  const cache = useCallback(
+    (s: State, p: boolean) => {
+      if (!session) return;
+      try {
+        localStorage.setItem(
+          "attendly-cache-" + session.username,
+          JSON.stringify({
+            state: s,
+            revision: revision.current,
+            pending: p,
+            intent: intent.current,
+          }),
+        );
+      } catch {
+        setError(
+          "Device storage is full. Keep this tab open and export a backup.",
+        );
+      }
+    },
+    [session],
+  );
+  const refresh = useCallback(
+    async (force = false) => {
+      if (!session || busy.current || (pending.current && !force)) return;
+      const token = session.token;
+      try {
+        const result = await request("state", session);
+        if (identity.current !== token || (pending.current && !force)) return;
+        revision.current = result.revision;
+        pending.current = false;
+        current.current = result.state;
+        setState(result.state);
+        cache(result.state, false);
+        setStatus("All changes synced");
+        setError("");
+        setReady(true);
+      } catch (e: any) {
+        setError(e.message);
+        setStatus("Offline · cached copy");
+        if (cached(session)) setReady(true);
+      }
+    },
+    [session, cache],
+  );
+  useEffect(() => {
+    identity.current = session?.token;
+    if (!session) {
+      setReady(true);
+      return;
+    }
+    const c = cached(session);
+    if (c) {
+      revision.current = c.revision;
+      pending.current = c.pending;
+      intent.current = c.intent;
+      current.current = c.state;
+      setState(c.state);
+      setReady(true);
+      if (c.pending) {
+        setStatus("Changes waiting to sync");
+        setTick((t) => t + 1);
+        return;
+      }
+    }
+    void refresh();
+  }, [session]);
+  useEffect(() => {
+    const id = setInterval(() => {
+      setClock(today());
+      void refresh();
+    }, 30000);
+    const focus = () => {
+      setClock(today());
+      setTick((t) => t + 1);
+      void refresh();
+    };
+    window.addEventListener("focus", focus);
+    window.addEventListener("online", focus);
+    return () => {
+      clearInterval(id);
+      window.removeEventListener("focus", focus);
+      window.removeEventListener("online", focus);
+    };
+  }, [refresh]);
+  useEffect(() => {
+    if (!session || !pending.current || busy.current) return;
+    const timer = setTimeout(async () => {
+      busy.current = true;
+      const snapshot = current.current,
+        token = session.token;
+      setStatus("Saving changes…");
+      try {
+        const result = await request(
+          "state",
+          session,
+          {
+            state: snapshot,
+            revision: revision.current,
+            intent: intent.current,
+          },
+          "PUT",
+        );
+        if (identity.current !== token) return;
+        revision.current = result.revision;
+        if (current.current === snapshot) {
+          pending.current = false;
+          intent.current = "edit";
+          cache(snapshot, false);
+          setStatus("All changes synced");
+          setError("");
+        } else {
+          cache(current.current, true);
+          setTick((t) => t + 1);
+        }
+      } catch (e: any) {
+        if (identity.current === token) {
+          setStatus(
+            e.status === 409
+              ? "Sync conflict · changes kept locally"
+              : "Changes waiting to sync",
+          );
+          setError(e.message);
+          cache(current.current, true);
+        }
+      } finally {
+        busy.current = false;
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [state, session, tick, cache]);
+  const update = (next: State | ((s: State) => State), mode = "edit") => {
+    if (!ready)
+      throw Error("Wait for your account to load before making changes.");
+    const value = typeof next === "function" ? next(current.current) : next;
+    current.current = value;
+    setState(value);
+    if (session) {
+      pending.current = true;
+      if (mode === "import") intent.current = "import";
+      cache(value, true);
+      setStatus("Changes waiting to sync");
+    }
+  };
+  const login = (result: any) => {
+    const u = { token: result.token, username: result.username };
+    const pendingCopy = cached(u);
+    if (pending.current && session && session.username !== u.username)
+      throw Error(
+        "Export your pending changes and load the cloud copy before switching accounts.",
+      );
+    const keepPending = pendingCopy?.pending === true;
+    const value = keepPending ? pendingCopy.state : result.state;
+    identity.current = u.token;
+    revision.current = keepPending ? pendingCopy.revision : result.revision;
+    current.current = value;
+    pending.current = keepPending;
+    intent.current = keepPending ? pendingCopy.intent : "edit";
+    setState(value);
+    localStorage.setItem("attendly-session", JSON.stringify(u));
+    localStorage.setItem(
+      "attendly-cache-" + u.username,
+      JSON.stringify({
+        state: value,
+        revision: revision.current,
+        pending: keepPending,
+        intent: intent.current,
+      }),
+    );
+    setSession(u);
+    setReady(true);
+    setError("");
+    setStatus(keepPending ? "Changes waiting to sync" : "All changes synced");
+  };
+  const logout = async () => {
+    if (pending.current)
+      throw Error(
+        "Sync your pending changes, or export them and load the cloud copy before signing out.",
+      );
+    if (session) {
+      await request("logout", session, {});
+      localStorage.removeItem("attendly-cache-" + session.username);
+    }
+    localStorage.removeItem("attendly-session");
+    identity.current = undefined;
+    setSession(null);
+    const fresh = initial();
+    current.current = fresh;
+    setState(fresh);
+    setStatus("Sample workspace");
+    setError("");
+  };
+  return {
+    state,
+    session,
+    status,
+    error,
+    setError,
+    update,
+    login,
+    logout,
+    refresh,
+    ready,
+    clock,
+    retry: () => setTick((t) => t + 1),
+  };
+}

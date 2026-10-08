@@ -1,0 +1,44 @@
+{
+  "name": "attendly",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/prepare-ocr.mjs && vite --host 127.0.0.1",
+    "build": "node scripts/prepare-ocr.mjs && tsc -b && vite build && node scripts/build-server.mjs",
+    "test": "tsx --test tests/*.test.ts",
+    "android:sync": "pnpm build && cap sync android",
+    "android:open": "cap open android",
+    "db:local": "wrangler d1 migrations apply attendly --local",
+    "dev:api": "wrangler dev --local --port 8787",
+    "preview": "wrangler dev --local --port 8787",
+    "test:api": "node tests/api.integration.mjs",
+    "format": "prettier --write src server tests scripts db"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.4.0",
+    "@capacitor/core": "^7.4.0",
+    "@capacitor/filesystem": "^7.1.0",
+    "@capacitor/share": "^7.0.0",
+    "@tesseract.js-data/eng": "^1.0.0",
+    "lucide-react": "^0.468.0",
+    "pdfjs-dist": "^5.4.149",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tesseract.js": "^6.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^4.5.0",
+    "drizzle-kit": "^0.31.0",
+    "drizzle-orm": "^0.44.0",
+    "esbuild": "^0.25.0",
+    "prettier": "^3.9.9",
+    "tsx": "^4.20.0",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5",
+    "wrangler": "^4.40.0"
+  }
+}

@@ -1,0 +1,6 @@
+<resources>
+    <color name="attendly_background">#254F42</color>
+    <color name="colorPrimary">#254F42</color>
+    <color name="colorPrimaryDark">#193D31</color>
+    <color name="colorAccent">#A6BE7B</color>
+</resources>
