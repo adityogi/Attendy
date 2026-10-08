@@ -83,9 +83,9 @@ export default function Account({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            minLength={12}
+            minLength={8}
             maxLength={256}
-            placeholder="At least 12 characters"
+            placeholder="At least 8 characters"
           />
         </label>
         {mode === "recover" && (

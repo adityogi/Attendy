@@ -261,7 +261,8 @@ export function timetableFromCSV(text: string) {
 export function timetableFromText(text: string): Slot[] {
   const result: Slot[] = [];
   let day = -1;
-  for (const line of text.split("\n")) {
+  const lines = text.split("\n");
+  for (const line of lines) {
     const lower = line.toLowerCase();
     const d = weekdays.findIndex((x) =>
       new RegExp(
@@ -272,14 +273,19 @@ export function timetableFromText(text: string): Slot[] {
     if (d >= 0) day = d;
     const times = [...line.matchAll(/\b(\d{1,2})[:.](\d{2})\s*(am|pm)?/gi)];
     if (day < 0 || times.length < 2) continue;
-    const time = (m: RegExpMatchArray) => {
+    const time = (m: RegExpMatchArray, isEnd = false, startHour?: number) => {
       let hour = Number(m[1]);
       if (m[3]) {
         hour %= 12;
         if (m[3].toLowerCase() === "pm") hour += 12;
+      } else {
+        if (hour >= 1 && hour <= 7) hour += 12;
+        else if (isEnd && startHour !== undefined && hour <= startHour) hour += 12;
       }
-      return `${String(hour).padStart(2, "0")}:${m[2]}`;
+      return { hour, str: `${String(hour).padStart(2, "0")}:${m[2]}` };
     };
+    const t0 = time(times[0], false);
+    const t1 = time(times[1], true, t0.hour);
     const subject = line
       .replace(
         /\b(sun(?:day)?|mon(?:day)?|tue(?:sday)?|wed(?:nesday)?|thu(?:rsday)?|fri(?:day)?|sat(?:urday)?)\b/gi,
@@ -287,16 +293,75 @@ export function timetableFromText(text: string): Slot[] {
       )
       .replace(/\b\d{1,2}[:.]\d{2}\s*(am|pm)?/gi, "")
       .replace(/^[\s|,:–—-]+|[\s|,:–—-]+$/g, "");
-    if (subject)
+    if (subject && t0.str < t1.str)
       result.push({
         id: crypto.randomUUID(),
         day,
         subject,
-        start: time(times[0]),
-        end: time(times[1]),
+        start: t0.str,
+        end: t1.str,
         room: "",
       });
   }
+  if (result.length > 0) return result;
+
+  // Grid text fallback (column times header + day rows)
+  const timeIntervals: { start: string; end: string }[] = [];
+  for (const line of lines) {
+    const matches = [
+      ...line.matchAll(
+        /(\d{1,2})[:.](\d{2})\s*(am|pm)?\s*(?:[-–—]|to)\s*(\d{1,2})[:.](\d{2})\s*(am|pm)?/gi,
+      ),
+    ];
+    if (matches.length >= 2) {
+      for (const m of matches) {
+        const h1 = Number(m[1]), h2 = Number(m[4]);
+        const startH = h1 >= 1 && h1 <= 7 ? h1 + 12 : h1;
+        let endH = h2 >= 1 && h2 <= 7 ? h2 + 12 : h2;
+        if (endH <= startH) endH += 12;
+        const start = `${String(startH).padStart(2, "0")}:${m[2]}`;
+        const end = `${String(endH).padStart(2, "0")}:${m[5]}`;
+        if (start < end) timeIntervals.push({ start, end });
+      }
+      if (timeIntervals.length >= 2) break;
+    }
+  }
+
+  if (timeIntervals.length >= 2) {
+    for (const line of lines) {
+      const lower = line.toLowerCase();
+      const dIndex = weekdays.findIndex((x) =>
+        new RegExp("\\b" + x.slice(0, 3) + "(?:" + x.slice(3) + ")?\\b", "i").test(
+          lower,
+        ),
+      );
+      if (dIndex < 0) continue;
+
+      const withoutDay = line
+        .replace(
+          /\b(sun(?:day)?|mon(?:day)?|tue(?:sday)?|wed(?:nesday)?|thu(?:rsday)?|fri(?:day)?|sat(?:urday)?)\b/gi,
+          "",
+        )
+        .trim();
+
+      const tokens = withoutDay
+        .split(/\s{2,}|\t+|[|]+/)
+        .map((t) => t.trim())
+        .filter((t) => t && !/^(break|lunch|free|recess|[-–—]+)$/i.test(t));
+
+      for (let i = 0; i < Math.min(tokens.length, timeIntervals.length); i++) {
+        result.push({
+          id: crypto.randomUUID(),
+          day: dIndex,
+          subject: tokens[i],
+          start: timeIntervals[i].start,
+          end: timeIntervals[i].end,
+          room: "",
+        });
+      }
+    }
+  }
+
   return result;
 }
 export async function extractText(

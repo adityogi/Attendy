@@ -5,7 +5,12 @@ export function useStore(initial: () => State) {
   const [session, setSession] = useState<Session | null>(readSession);
   const [state, setState] = useState<State>(() => {
     const u = readSession();
-    return u ? (cached(u)?.state ?? initial()) : initial();
+    if (u) return cached(u)?.state ?? initial();
+    try {
+      const guest = localStorage.getItem("attendly-guest-state");
+      if (guest) return JSON.parse(guest);
+    } catch {}
+    return initial();
   });
   const [status, setStatus] = useState("Sample workspace");
   const [error, setError] = useState("");
@@ -20,17 +25,20 @@ export function useStore(initial: () => State) {
     identity = useRef(session?.token);
   const cache = useCallback(
     (s: State, p: boolean) => {
-      if (!session) return;
       try {
-        localStorage.setItem(
-          "attendly-cache-" + session.username,
-          JSON.stringify({
-            state: s,
-            revision: revision.current,
-            pending: p,
-            intent: intent.current,
-          }),
-        );
+        if (session) {
+          localStorage.setItem(
+            "attendly-cache-" + session.username,
+            JSON.stringify({
+              state: s,
+              revision: revision.current,
+              pending: p,
+              intent: intent.current,
+            }),
+          );
+        } else {
+          localStorage.setItem("attendly-guest-state", JSON.stringify(s));
+        }
       } catch {
         setError(
           "Device storage is full. Keep this tab open and export a backup.",
@@ -155,10 +163,13 @@ export function useStore(initial: () => State) {
     current.current = value;
     setState(value);
     if (session) {
-      pending.current = true;
+      pending.current = !session.token.startsWith("local_");
       if (mode === "import") intent.current = "import";
-      cache(value, true);
-      setStatus("Changes waiting to sync");
+      cache(value, pending.current);
+      setStatus(session.token.startsWith("local_") ? "All changes saved locally" : "Changes waiting to sync");
+    } else {
+      cache(value, false);
+      setStatus("Saved on device (Guest mode)");
     }
   };
   const login = (result: any) => {
@@ -169,7 +180,7 @@ export function useStore(initial: () => State) {
         "Export your pending changes and load the cloud copy before switching accounts.",
       );
     const keepPending = pendingCopy?.pending === true;
-    const value = keepPending ? pendingCopy.state : result.state;
+    const value = keepPending ? pendingCopy.state : (result.state ?? current.current);
     identity.current = u.token;
     revision.current = keepPending ? pendingCopy.revision : result.revision;
     current.current = value;
