@@ -95,8 +95,10 @@ export function Timetable({
     [preview],
   );
   const begin = () => {
-    setRows((latest?.slots ?? []).map((x) => ({ ...x })));
-    setEffective(latest ? addDays(today(), 1) : START);
+    setRows((version?.slots ?? latest?.slots ?? []).map((x) => ({ ...x })));
+    setEffective(
+      version && version.id !== "sample" ? version.effective : START,
+    );
     setEditing(true);
     setError("");
     setRaw("");
@@ -118,6 +120,11 @@ export function Timetable({
               : (data.slots ?? data.versions?.at(-1)?.slots),
           ),
         );
+        if (!Array.isArray(data) && data.effective) {
+          setEffective(data.effective);
+        } else if (Object.keys(s.records).length === 0) {
+          setEffective(START);
+        }
       } else if (f.name.endsWith(".csv"))
         setRows(timetableFromCSV(await f.text()));
       else {
@@ -172,6 +179,48 @@ export function Timetable({
                 ))}
             </select>
           </label>
+          {version && version.effective > START && (
+            <button
+              onClick={() => {
+                const records = { ...s.records };
+                for (const [k, r] of Object.entries(records)) {
+                  if (r.slotId.startsWith("sample-")) {
+                    delete records[k];
+                  }
+                }
+                onSave({
+                  ...s,
+                  records,
+                  versions: [
+                    ...s.versions.filter(
+                      (v) => v.id !== version.id && v.id !== "sample" && v.effective !== START,
+                    ),
+                    { ...version, effective: START },
+                  ],
+                });
+                notify(`Applied timetable for the entire semester from ${START}!`);
+              }}
+            >
+              <Check size={16} />
+              Apply from semester start (29 Sep)
+            </button>
+          )}
+          {s.versions.length > 1 && (
+            <button
+              onClick={() => {
+                if (version) {
+                  onSave({
+                    ...s,
+                    versions: s.versions.filter((v) => v.id !== version.id),
+                  });
+                  notify("Removed timetable version.");
+                }
+              }}
+            >
+              <Trash2 size={16} />
+              Delete version
+            </button>
+          )}
           <button
             onClick={() =>
               download(
@@ -276,14 +325,29 @@ export function Timetable({
             Effective from
             <input
               type="date"
-              min={latest ? (today() < START ? START : today()) : START}
+              min={START}
               value={effective}
               onChange={(e) => setEffective(e.target.value)}
             />
           </label>
+          <div style={{ display: "flex", gap: "8px", margin: "4px 0 12px 0" }}>
+            <button
+              type="button"
+              className={effective === START ? "selected" : ""}
+              onClick={() => setEffective(START)}
+            >
+              Semester start ({START})
+            </button>
+            <button
+              type="button"
+              className={effective === today() ? "selected" : ""}
+              onClick={() => setEffective(today())}
+            >
+              Today ({today()})
+            </button>
+          </div>
           <p className="subtle">
-            Earlier timetable versions stay in your history. Use the same
-            subject name to continue its attendance count.
+            Applying from semester start ({START}) updates your calendar immediately for the entire semester.
           </p>
           <div className="editor-rows">
             {rows.map((r, i) => (
@@ -412,15 +476,9 @@ export function Timetable({
               onClick={() => {
                 try {
                   const slots = validateSlots(rows);
-                  if (
-                    (latest && effective < today()) ||
-                    effective < START ||
-                    !effective
-                  )
-                    throw Error("Choose today or a future effective date.");
-                  if (Object.values(s.records).some((r) => r.date >= effective))
+                  if (!effective || effective < START)
                     throw Error(
-                      "Attendance is already recorded on or after this date. Choose a later effective date to preserve your history.",
+                      `Choose an effective date on or after semester start (${START}).`,
                     );
                   const subjects = [
                     ...new Set(
@@ -444,10 +502,22 @@ export function Timetable({
                         throw Error(
                           `Overlapping classes on ${DAYS[a.day]}. Check ${a.subject} and ${b.subject}.`,
                         );
+                  const records = { ...s.records };
+                  for (const [k, r] of Object.entries(records)) {
+                    if (r.slotId.startsWith("sample-")) {
+                      delete records[k];
+                    }
+                  }
                   onSave({
                     ...s,
+                    records,
                     versions: [
-                      ...s.versions.filter((v) => v.effective !== effective),
+                      ...s.versions.filter(
+                        (v) =>
+                          v.id !== "sample" &&
+                          v.effective !== effective &&
+                          (effective !== START || v.effective > START),
+                      ),
                       { id: crypto.randomUUID(), effective, slots },
                     ],
                   });
