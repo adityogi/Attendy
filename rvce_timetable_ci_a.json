@@ -1,0 +1,182 @@
+{
+  "id": "rvce-aiml-ci-a-chem-cycle",
+  "effective": "2026-09-29",
+  "slots": [
+    {
+      "id": "mon-yoga-0900",
+      "subject": "HS115YL - Health & Yoga Practice",
+      "day": 1,
+      "start": "09:00",
+      "end": "11:00",
+      "room": "AIML CR-001"
+    },
+    {
+      "id": "mon-chem-1130",
+      "subject": "CM211IA - Chemistry of Smart Materials",
+      "day": 1,
+      "start": "11:30",
+      "end": "12:30",
+      "room": "AIML CR-001"
+    },
+    {
+      "id": "mon-math-1230",
+      "subject": "MA211TC - Linear Algebra & Calculus",
+      "day": 1,
+      "start": "12:30",
+      "end": "13:30",
+      "room": "AIML CR-001"
+    },
+    {
+      "id": "mon-prog-lab-1430",
+      "subject": "XX115XIX - Programming Language Lab",
+      "day": 1,
+      "start": "14:30",
+      "end": "16:30",
+      "room": "Computing Lab"
+    },
+    {
+      "id": "tue-esc-0900",
+      "subject": "XX113XTX - Engineering Science-1",
+      "day": 2,
+      "start": "09:00",
+      "end": "10:00",
+      "room": "AIML CR-001"
+    },
+    {
+      "id": "tue-prog-1000",
+      "subject": "XX115XIX - Programming Language Course",
+      "day": 2,
+      "start": "10:00",
+      "end": "11:00",
+      "room": "AIML CR-001"
+    },
+    {
+      "id": "tue-math-1130",
+      "subject": "MA211TC - Linear Algebra & Calculus",
+      "day": 2,
+      "start": "11:30",
+      "end": "12:30",
+      "room": "AIML CR-001"
+    },
+    {
+      "id": "tue-const-1230",
+      "subject": "HS112TC - Indian Constitution",
+      "day": 2,
+      "start": "12:30",
+      "end": "13:30",
+      "room": "AIML CR-001"
+    },
+    {
+      "id": "tue-el-1430",
+      "subject": "Experiential Learning",
+      "day": 2,
+      "start": "14:30",
+      "end": "16:30",
+      "room": "AIML CR-001"
+    },
+    {
+      "id": "wed-math-0900",
+      "subject": "MA211TC - Linear Algebra & Calculus",
+      "day": 3,
+      "start": "09:00",
+      "end": "10:00",
+      "room": "AIML CR-001"
+    },
+    {
+      "id": "wed-chem-1000",
+      "subject": "CM211IA - Chemistry of Smart Materials",
+      "day": 3,
+      "start": "10:00",
+      "end": "11:00",
+      "room": "AIML CR-001"
+    },
+    {
+      "id": "wed-esc-1130",
+      "subject": "XX113XTX - Engineering Science-1",
+      "day": 3,
+      "start": "11:30",
+      "end": "12:30",
+      "room": "AIML CR-001"
+    },
+    {
+      "id": "wed-prog-1230",
+      "subject": "XX115XIX - Programming Language Course",
+      "day": 3,
+      "start": "12:30",
+      "end": "13:30",
+      "room": "AIML CR-001"
+    },
+    {
+      "id": "wed-caeg-1430",
+      "subject": "ME112GL - CAEG (Theory)",
+      "day": 3,
+      "start": "14:30",
+      "end": "16:30",
+      "room": "AIML CR-001"
+    },
+    {
+      "id": "thu-caeg-lab-0900",
+      "subject": "ME112GL - CAEG (Lab)",
+      "day": 4,
+      "start": "09:00",
+      "end": "11:00",
+      "room": "CCH2 Lab"
+    },
+    {
+      "id": "thu-esc-1130",
+      "subject": "XX113XTX - Engineering Science-1",
+      "day": 4,
+      "start": "11:30",
+      "end": "12:30",
+      "room": "AIML CR-001"
+    },
+    {
+      "id": "thu-counsel-1230",
+      "subject": "Counselling",
+      "day": 4,
+      "start": "12:30",
+      "end": "13:30",
+      "room": "AIML CR-001"
+    },
+    {
+      "id": "thu-el-1430",
+      "subject": "Experiential Learning",
+      "day": 4,
+      "start": "14:30",
+      "end": "16:30",
+      "room": "AIML CR-001"
+    },
+    {
+      "id": "fri-chem-0900",
+      "subject": "CM211IA - Chemistry of Smart Materials",
+      "day": 5,
+      "start": "09:00",
+      "end": "10:00",
+      "room": "AIML CR-001"
+    },
+    {
+      "id": "fri-math-1000",
+      "subject": "MA211TC - Linear Algebra & Calculus",
+      "day": 5,
+      "start": "10:00",
+      "end": "11:00",
+      "room": "AIML CR-001"
+    },
+    {
+      "id": "fri-eng-1130",
+      "subject": "HS111EL - Communicative English-1",
+      "day": 5,
+      "start": "11:30",
+      "end": "13:30",
+      "room": "AIML CR-001"
+    },
+    {
+      "id": "fri-chem-lab-1430",
+      "subject": "CM211IA - Chemistry Lab",
+      "day": 5,
+      "start": "14:30",
+      "end": "16:30",
+      "room": "Chem Lab 1-3"
+    }
+  ]
+}
