@@ -74,6 +74,51 @@ export function slotsOn(s: State, date: string) {
     .filter((a) => a.day === new Date(date + "T12:00:00Z").getUTCDay())
     .sort((a, b) => a.start.localeCompare(b.start));
 }
+export function autoHealState(s: State): State {
+  if (!s || !Array.isArray(s.versions) || s.versions.length === 0) return s;
+  const isSampleVersion = (v: Version) =>
+    v.id === "sample" ||
+    v.slots.some((sl) => sl.id?.startsWith("sample-")) ||
+    (v.slots.length === 15 &&
+      v.slots.every((sl) =>
+        ["Mathematics", "Physics", "Computer Science"].includes(sl.subject),
+      ));
+  const hasSample = s.versions.some(isSampleVersion);
+  const realVersions = s.versions.filter((v) => !isSampleVersion(v));
+  if (realVersions.length > 0 && hasSample) {
+    const sorted = [...realVersions].sort((a, b) =>
+      a.effective.localeCompare(b.effective),
+    );
+    sorted[0] = { ...sorted[0], effective: START };
+    const records = { ...s.records };
+    for (const [k, r] of Object.entries(records)) {
+      if (
+        r.slotId?.startsWith("sample-") ||
+        ["Mathematics", "Physics", "Computer Science"].includes(r.subject)
+      ) {
+        delete records[k];
+      }
+    }
+    return {
+      ...s,
+      versions: sorted,
+      records,
+    };
+  }
+  if (realVersions.length > 0 && s.versions.length === realVersions.length) {
+    const sorted = [...realVersions].sort((a, b) =>
+      a.effective.localeCompare(b.effective),
+    );
+    if (sorted[0].effective > START) {
+      sorted[0] = { ...sorted[0], effective: START };
+      return {
+        ...s,
+        versions: sorted,
+      };
+    }
+  }
+  return s;
+}
 export function mark(
   s: State,
   date: string,

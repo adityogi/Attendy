@@ -1,16 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { State, today } from "./domain";
+import { State, today, autoHealState } from "./domain";
 import { cached, readSession, request, Session } from "./api";
 export function useStore(initial: () => State) {
   const [session, setSession] = useState<Session | null>(readSession);
   const [state, setState] = useState<State>(() => {
     const u = readSession();
-    if (u) return cached(u)?.state ?? initial();
-    try {
-      const guest = localStorage.getItem("attendly-guest-state");
-      if (guest) return JSON.parse(guest);
-    } catch {}
-    return initial();
+    let s = initial();
+    if (u) s = cached(u)?.state ?? initial();
+    else {
+      try {
+        const guest = localStorage.getItem("attendly-guest-state");
+        if (guest) s = JSON.parse(guest);
+      } catch {}
+    }
+    return autoHealState(s);
   });
   const [status, setStatus] = useState("Sample workspace");
   const [error, setError] = useState("");
@@ -54,12 +57,17 @@ export function useStore(initial: () => State) {
       try {
         const result = await request("state", session);
         if (identity.current !== token || (pending.current && !force)) return;
+        const healed = autoHealState(result.state);
+        const wasHealed = JSON.stringify(healed) !== JSON.stringify(result.state);
         revision.current = result.revision;
-        pending.current = false;
-        current.current = result.state;
-        setState(result.state);
-        cache(result.state, false);
-        setStatus("All changes synced");
+        pending.current = wasHealed;
+        current.current = healed;
+        setState(healed);
+        cache(healed, wasHealed);
+        if (wasHealed) {
+          setTick((t) => t + 1);
+        }
+        setStatus(session.token.startsWith("local_") ? "All changes saved locally" : "All changes synced");
         setError("");
         setReady(true);
       } catch (e: any) {
@@ -78,14 +86,19 @@ export function useStore(initial: () => State) {
     }
     const c = cached(session);
     if (c) {
+      const healed = autoHealState(c.state);
+      const wasHealed = JSON.stringify(healed) !== JSON.stringify(c.state);
       revision.current = c.revision;
-      pending.current = c.pending;
+      pending.current = c.pending || wasHealed;
       intent.current = c.intent;
-      current.current = c.state;
-      setState(c.state);
+      current.current = healed;
+      setState(healed);
+      if (wasHealed) {
+        cache(healed, pending.current);
+      }
       setReady(true);
-      if (c.pending) {
-        setStatus("Changes waiting to sync");
+      if (c.pending || wasHealed) {
+        setStatus(session.token.startsWith("local_") ? "All changes saved locally" : "Changes waiting to sync");
         setTick((t) => t + 1);
         return;
       }
@@ -159,7 +172,8 @@ export function useStore(initial: () => State) {
   const update = (next: State | ((s: State) => State), mode = "edit") => {
     if (!ready)
       throw Error("Wait for your account to load before making changes.");
-    const value = typeof next === "function" ? next(current.current) : next;
+    const rawValue = typeof next === "function" ? next(current.current) : next;
+    const value = autoHealState(rawValue);
     current.current = value;
     setState(value);
     if (session) {

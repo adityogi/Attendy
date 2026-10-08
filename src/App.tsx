@@ -26,6 +26,7 @@ import {
   addDays,
   dates,
   Stat,
+  autoHealState,
 } from "./domain";
 import Calendar, { format, subjectColor } from "./Calendar";
 import { Modal, Timetable, Holidays, DataTools } from "./Editors";
@@ -61,7 +62,7 @@ const NAV = [
 ];
 export default function App() {
   const store = useStore(demoState),
-    s = store.state,
+    s = autoHealState(store.state),
     now = store.clock;
   const [tab, setTab] = useState("attendance"),
     [date, setDate] = useState(today()),
@@ -94,6 +95,13 @@ export default function App() {
     window.addEventListener("beforeinstallprompt", fn);
     return () => window.removeEventListener("beforeinstallprompt", fn);
   }, []);
+  useEffect(() => {
+    if (JSON.stringify(s) !== JSON.stringify(store.state)) {
+      try {
+        store.update(s);
+      } catch {}
+    }
+  }, [s, store]);
   const save = (v: State, mode = "edit") => {
     try {
       store.update(v, mode);

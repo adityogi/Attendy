@@ -11,6 +11,7 @@ import {
   START,
   addDays,
   dates,
+  autoHealState,
 } from "../src/domain.ts";
 import {
   csv,
@@ -258,4 +259,37 @@ test("planner miss allowance keeps the forecast denominator fixed", () => {
   assert.equal(a[0].safe, 0);
   const b = statistics(s, "2026-10-01", "2026-10-31", true, START, 75);
   assert.equal(b[0].safe, 1);
+});
+test("autoHealState promotes user timetable to START and removes sample timetable and demo records", () => {
+  const s = emptyState();
+  s.versions = [
+    {
+      id: "sample",
+      effective: START,
+      slots: [
+        { id: "sample-1-0", subject: "Mathematics", day: 1, start: "09:00", end: "10:00", room: "204" },
+        { id: "sample-1-1", subject: "Physics", day: 1, start: "10:30", end: "11:30", room: "Lab" },
+        { id: "sample-1-2", subject: "Computer Science", day: 1, start: "13:30", end: "14:30", room: "301" },
+      ],
+    },
+    {
+      id: "real-rvce",
+      effective: "2026-10-09",
+      slots: [
+        { id: "real-1", subject: "ME112GL - CAEG", day: 1, start: "09:00", end: "11:00", room: "CR-001" },
+      ],
+    },
+  ];
+  s.records[key(START, "sample-1-0")] = {
+    date: START,
+    slotId: "sample-1-0",
+    subject: "Mathematics",
+    start: "09:00",
+    status: "present",
+  };
+  const healed = autoHealState(s);
+  assert.equal(healed.versions.length, 1);
+  assert.equal(healed.versions[0].id, "real-rvce");
+  assert.equal(healed.versions[0].effective, START);
+  assert.equal(Object.keys(healed.records).length, 0);
 });
