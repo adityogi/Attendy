@@ -1,0 +1,54 @@
+{
+  "name": "Attendy — RVCE Attendance & CIE Tracker",
+  "short_name": "Attendy",
+  "description": "Offline per-class attendance tracker and 85% CIE exam eligibility calculator for RVCE students.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#000000",
+  "theme_color": "#2563eb",
+  "categories": ["education", "utilities"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Mark Today's Attendance",
+      "short_name": "Today",
+      "description": "Jump to today's classes and mark attendance",
+      "url": "./index.html?view=day",
+      "icons": [{ "src": "./icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "CIE Eligibility Check",
+      "short_name": "CIE 85%",
+      "description": "Check your CIE exam eligibility status",
+      "url": "./index.html?view=cie",
+      "icons": [{ "src": "./icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Future Predictor",
+      "short_name": "Predict",
+      "description": "Predict future attendance scenarios",
+      "url": "./index.html?view=predictor",
+      "icons": [{ "src": "./icon.svg", "sizes": "any" }]
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
+}

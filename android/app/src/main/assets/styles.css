@@ -1,0 +1,290 @@
+/* Apple Calendar Inspired Design for ClassTrack */
+
+/* System Font Family */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Cupertino Segmented Control */
+.apple-segmented-control {
+  background-color: rgba(226, 232, 240, 0.7);
+  padding: 3px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.dark .apple-segmented-control {
+  background-color: rgba(30, 41, 59, 0.8);
+}
+
+.apple-segmented-btn {
+  padding: 6px 14px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.dark .apple-segmented-btn {
+  color: #94a3b8;
+}
+
+.apple-segmented-btn:hover {
+  color: #0f172a;
+}
+
+.dark .apple-segmented-btn:hover {
+  color: #ffffff;
+}
+
+.apple-segmented-btn.active {
+  background-color: #ffffff;
+  color: #0f172a;
+  font-weight: 600;
+  box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.1), 0 1px 3px -1px rgba(0, 0, 0, 0.06);
+}
+
+.dark .apple-segmented-btn.active {
+  background-color: #334155;
+  color: #ffffff;
+  box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+/* Apple Calendar Month Grid */
+.calendar-month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.calendar-cell {
+  min-height: 80px;
+  padding: 8px 6px;
+  border-right: 1px solid rgba(226, 232, 240, 0.8);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  transition: background-color 0.15s ease;
+  position: relative;
+  cursor: pointer;
+}
+
+.dark .calendar-cell {
+  border-right: 1px solid rgba(51, 65, 85, 0.6);
+  border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+}
+
+.calendar-cell:hover {
+  background-color: rgba(241, 245, 249, 0.6);
+}
+
+.dark .calendar-cell:hover {
+  background-color: rgba(30, 41, 59, 0.4);
+}
+
+.calendar-cell.other-month {
+  opacity: 0.35;
+}
+
+.calendar-cell.selected-date {
+  background-color: rgba(239, 246, 255, 0.9);
+}
+
+.dark .calendar-cell.selected-date {
+  background-color: rgba(30, 58, 138, 0.3);
+}
+
+/* Apple Iconic Today Circle */
+.apple-today-circle {
+  background-color: #ef4444; /* Apple Calendar Red */
+  color: #ffffff !important;
+  font-weight: 700;
+  border-radius: 9999px;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+.apple-selected-circle {
+  background-color: #2563eb; /* Apple Calendar Blue */
+  color: #ffffff !important;
+  font-weight: 700;
+  border-radius: 9999px;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Apple Calendar Day Timeline */
+.timeline-hour-row {
+  min-height: 64px;
+  border-top: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.dark .timeline-hour-row {
+  border-top: 1px solid rgba(51, 65, 85, 0.6);
+}
+
+/* Apple Calendar Event Card */
+.apple-event-card {
+  border-left-width: 4px;
+  border-radius: 14px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.apple-event-card:hover {
+  transform: translateY(-1px);
+}
+
+/* Modals */
+.modal-backdrop {
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.modal-backdrop.active {
+  opacity: 1;
+}
+
+/* Status Button Active States */
+.status-btn {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.status-btn:active {
+  transform: scale(0.96);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+/* Toast Animation */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toast-animate {
+  animation: slideInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Future Date Cells */
+.calendar-cell.future-cell {
+  background-color: rgba(248, 250, 252, 0.4);
+}
+
+.dark .calendar-cell.future-cell {
+  background-color: rgba(15, 23, 42, 0.2);
+}
+
+/* Mobile Responsiveness & Touch Optimization */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.safe-bottom {
+  padding-bottom: calc(0.4rem + env(safe-area-inset-bottom, 0px));
+}
+
+.mobile-nav-btn {
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobile-nav-btn.active {
+  color: #2563eb;
+}
+
+.dark .mobile-nav-btn.active {
+  color: #60a5fa;
+}
+
+.mobile-nav-btn.active i {
+  transform: scale(1.12);
+  transition: transform 0.15s ease;
+}
+
+@media (max-width: 640px) {
+  .calendar-cell {
+    min-height: 52px;
+    padding: 4px 2px;
+  }
+
+  .apple-today-circle, .apple-selected-circle {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+  }
+}
+
+/* RV Utility Inspired Analytics Grid & Badges */
+.rv-dot-grid {
+  background-image: linear-gradient(rgba(148, 163, 184, 0.18) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(148, 163, 184, 0.18) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.rv-badge-safe {
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #047857;
+}
+
+.dark .rv-badge-safe {
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  background-color: rgba(6, 78, 59, 0.4);
+  color: #6ee7b7;
+}
+
+.rv-badge-danger {
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #b91c1c;
+}
+
+.dark .rv-badge-danger {
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  background-color: rgba(127, 29, 29, 0.4);
+  color: #fca5a5;
+}
+
+.rv-badge-warning {
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #b45309;
+}
+
+.dark .rv-badge-warning {
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  background-color: rgba(120, 53, 15, 0.4);
+  color: #fcd34d;
+}
+
+
