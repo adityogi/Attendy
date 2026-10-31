@@ -106,3 +106,38 @@ export const needToAttend = (attended: number, held: number) =>
     0,
     Math.ceil((TARGET * held - 100 * attended) / (100 - TARGET) - 1e-9),
   );
+
+export type Slot = {
+  day: number; // 0 = Sunday
+  start: string;
+  end: string;
+  title: string;
+  code: string | null;
+  room: string;
+};
+
+// RVCE AIML CI-A timetable (Chemistry cycle). `code` links a slot to a report subject.
+export const TIMETABLE: Slot[] = [
+  { day: 1, start: "09:00", end: "11:00", title: "Health & Yoga Practice", code: "HS115YL", room: "AIML CR-001" },
+  { day: 1, start: "11:30", end: "12:30", title: "Chemistry of Smart Materials", code: "CM211IA", room: "AIML CR-001" },
+  { day: 1, start: "12:30", end: "13:30", title: "Linear Algebra & Calculus", code: "MA211TC", room: "AIML CR-001" },
+  { day: 1, start: "14:30", end: "16:30", title: "Programming Language Lab", code: "CS115AID", room: "Computing Lab" },
+  { day: 2, start: "09:00", end: "10:00", title: "Engineering Science-1", code: "EC113ATC", room: "AIML CR-001" },
+  { day: 2, start: "10:00", end: "11:00", title: "Programming Language Course", code: "CS115AID", room: "AIML CR-001" },
+  { day: 2, start: "11:30", end: "12:30", title: "Linear Algebra & Calculus", code: "MA211TC", room: "AIML CR-001" },
+  { day: 2, start: "12:30", end: "13:30", title: "Indian Constitution", code: "HS114TC", room: "AIML CR-001" },
+  { day: 2, start: "14:30", end: "16:30", title: "Experiential Learning", code: null, room: "AIML CR-001" },
+  { day: 3, start: "09:00", end: "10:00", title: "Linear Algebra & Calculus", code: "MA211TC", room: "AIML CR-001" },
+  { day: 3, start: "10:00", end: "11:00", title: "Chemistry of Smart Materials", code: "CM211IA", room: "AIML CR-001" },
+  { day: 3, start: "11:30", end: "12:30", title: "Engineering Science-1", code: "EC113ATC", room: "AIML CR-001" },
+  { day: 3, start: "12:30", end: "13:30", title: "Programming Language Course", code: "CS115AID", room: "AIML CR-001" },
+  { day: 3, start: "14:30", end: "16:30", title: "CAEG (Theory)", code: "ME112GL", room: "AIML CR-001" },
+  { day: 4, start: "09:00", end: "11:00", title: "CAEG (Lab)", code: "ME112GL", room: "CCH2 Lab" },
+  { day: 4, start: "11:30", end: "12:30", title: "Engineering Science-1", code: "EC113ATC", room: "AIML CR-001" },
+  { day: 4, start: "12:30", end: "13:30", title: "Counselling", code: null, room: "AIML CR-001" },
+  { day: 4, start: "14:30", end: "16:30", title: "Experiential Learning", code: null, room: "AIML CR-001" },
+  { day: 5, start: "09:00", end: "10:00", title: "Chemistry of Smart Materials", code: "CM211IA", room: "AIML CR-001" },
+  { day: 5, start: "10:00", end: "11:00", title: "Linear Algebra & Calculus", code: "MA211TC", room: "AIML CR-001" },
+  { day: 5, start: "11:30", end: "13:30", title: "Communicative English-1", code: "HS111EL", room: "AIML CR-001" },
+  { day: 5, start: "14:30", end: "16:30", title: "Chemistry Lab", code: "CM211IA", room: "Chem Lab 1-3" },
+];
