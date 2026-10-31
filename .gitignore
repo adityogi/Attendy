@@ -27,3 +27,9 @@ android/**/*.iml
 *.log
 .env
 .env.local
+
+# Build output
+dist/
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor*.json
+android/capacitor-cordova-android-plugins/

@@ -7,12 +7,3 @@ createRoot(document.getElementById("root")!).render(
     <App />
   </React.StrictMode>,
 );
-if (
-  (import.meta as any).env.PROD &&
-  "serviceWorker" in navigator &&
-  location.protocol === "https:"
-) {
-  window.addEventListener("load", () =>
-    navigator.serviceWorker.register("./sw.js").catch(() => {}),
-  );
-}
